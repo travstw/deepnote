@@ -47,13 +47,7 @@ waveElem.addEventListener('change', () => {
 
 
 function init() {
-    oscillators.forEach(osc => {
-        if (osc.playing) {
-            osc.playing = false;
-            osc.osc.stop();
-        }
-    });
-    
+    stop();
     frequencyGenerators = getFrequencyGenerators();
     panGenerator = getPanGenerator();
     oscillators = createOscillators();
@@ -136,7 +130,7 @@ function play() {
     oscillators.forEach(osc => {
         osc.gain.gain.exponentialRampToValueAtTime(osc.finishingGain, audioContext.currentTime + 12);
         const fadeoutStart = audioContext.currentTime + 24;
-        osc.gain.gain.setTargetAtTime(0.0001, fadeoutStart, 1.0);
+        osc.gain.gain.setTargetAtTime(0.0, fadeoutStart, 1.0);
 
         const pannerStart = audioContext.currentTime + 10;
         const pannerTime = (Math.random() * 0.85) + 0.75;
@@ -199,3 +193,13 @@ function setWave() {
     }   
     return wave;
 }
+
+function stop() {
+    oscillators.forEach(osc => {
+        if (osc.playing) {
+            osc.playing = false;
+            osc.osc.stop();
+        }
+    });
+}
+
