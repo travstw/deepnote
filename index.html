@@ -1,0 +1,25 @@
+<html>
+    <body>
+        <div id="params">
+        Voices: <select id="voices">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="30" selected>30</option>
+            <option value="40">40</option>
+            <option value="50">50</option>
+            <option value="60">60</option>
+            <option value="70">70</option>
+        </select><br><br>
+        Initial Frequency Range: <input id="initialFreqLow" value="200"/><input id="initialFreqHigh" value="400"/><br><br>
+        Wave Shape: <select id="wave">
+            <option value="sine">sine</option>
+            <option value="square">square</option>
+            <option value="sawtooth" selected>sawtooth</option>
+            <option value="triangle">triangle</option>
+            <option value="multi">multi</option>
+        </select>
+        </div><br>
+        <button id="playButton">play</button>
+        <script src="deep.script.js"></script>
+    </body>
+</html>
