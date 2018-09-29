@@ -2,13 +2,30 @@
     <body>
         <div id="params">
         Voices: <select id="voices">
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="30" selected>30</option>
-            <option value="40">40</option>
-            <option value="50">50</option>
-            <option value="60">60</option>
-            <option value="70">70</option>
+            <option value="11">10</option>
+            <option value="22">20</option>
+            <option value="33" selected>30</option>
+            <option value="44">40</option>
+            <option value="55">50</option>
+            <option value="66">60</option>
+            <option value="77">70</option>
+        </select><br><br>
+        Final Chord: <select id="root">
+            <option value="A">A</option>
+            <option value="A#">A#</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="C#">C#</option>
+            <option value="D" selected>D</option>
+            <option value="D#">D#</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="F#">F#</option>
+            <option value="G">G</option>
+        </select>
+        <select id="chord">
+            <option value="major" selected>major</option>
+            <option value="minor">minor</option>
         </select><br><br>
         Initial Frequency Range: <input id="initialFreqLow" value="200"/><input id="initialFreqHigh" value="400"/><br><br>
         Wave Shape: <select id="wave">
@@ -25,7 +42,8 @@
         Fade Out Start (sec): <input id="fadeOutStart" value="26"/>
         </div><br>
         <button id="playButton">play</button>
-        <button id="resetDefaults">reset</button>
+        <button id="resetDefaults">reset</button><br><br>
+        Volume: <input type="range" min="0" max="100" value="50" class="slider" id="volume">
         <script src="deepnote.js"></script>
     </body>
 </html>

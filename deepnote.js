@@ -1,12 +1,36 @@
 'use strict';
 
 const audioContext = new AudioContext();
+const outputBus = new GainNode(audioContext, {gain: 0.25});
+outputBus.connect(audioContext.destination);
+
+const chordMultipliers = {
+    major: [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 40.5],
+    minor: [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 37.92]
+}
+
+const chordRootFrequences = {
+    'A': 28,
+    'A#': 29,
+    'B': 31,
+    'C': 33,
+    'C#': 35,
+    'D': 36,
+    'D#': 39,
+    'E': 41,
+    'F': 44,
+    'F#': 46,
+    'G': 49
+}
+
 const WAVE_TYPES = ['sine', 'square', 'sawtooth', 'triangle'];
 let frequencyGenerators;
 let panGenerator; 
 let oscillators = []; 
 
 //Parameters
+let root;
+let chord;
 let voices;
 let initialFreqLow;
 let initialFreqHigh;
@@ -19,25 +43,37 @@ let fadeIn;
 let fadeOutStart;
 
 //DOM elements
-const playButtonElem = document.getElementById('playButton');
-const resetDefaultsElem = document.getElementById('resetDefaults');
+
+const voicesElem = document.getElementById('voices');
+const rootElem = document.getElementById('root');
+const chordElem = document.getElementById('chord');
+const waveElem = document.getElementById('wave');
 const initialFreqLowElem = document.getElementById('initialFreqLow');
 const initialFreqHighElem = document.getElementById('initialFreqHigh');
-const voicesElem = document.getElementById('voices');
-const waveElem = document.getElementById('wave');
 const lengthElem = document.getElementById('length');
 const rampStartElem = document.getElementById('rampStart');
 const rampLengthElem = document.getElementById('rampLength');
 const fadeInElem = document.getElementById('fadeIn');
 const fadeOutStartElem = document.getElementById('fadeOutStart');
+const playButtonElem = document.getElementById('playButton');
+const resetDefaultsElem = document.getElementById('resetDefaults');
+const volumeElem = document.getElementById('volume');
 
 //Event Listeners
-playButtonElem.addEventListener('click', () => {
-    play();
+
+
+
+
+voicesElem.addEventListener('change', () => {
+    voices = voicesElem.value;
 });
 
-resetDefaultsElem.addEventListener('click', () => {
-    setDefaultParams();
+rootElem.addEventListener('change', () => {
+    root = rootElem.value;
+});
+
+chordElem.addEventListener('change', () => {
+    chord = chordElem.value;
 });
 
 initialFreqLowElem.addEventListener('change', () => {
@@ -46,10 +82,6 @@ initialFreqLowElem.addEventListener('change', () => {
 
 initialFreqHighElem.addEventListener('change', () => {
     initialFreqHigh = initialFreqHighElem.value;
-});
-
-voicesElem.addEventListener('change', () => {
-    voices = voicesElem.value;
 });
 
 waveElem.addEventListener('change', () => {
@@ -63,33 +95,49 @@ lengthElem.addEventListener('change', () => {
 
 rampStartElem.addEventListener('change', () => {
     rampStart = parseInt(rampStartElem.value);
-    console.log(rampStart);
 });
 
 rampLengthElem.addEventListener('change', () => {
     rampLength = parseInt(rampLengthElem.value);
-    console.log(rampLength);
 });
 
 fadeInElem.addEventListener('change', () => {
     fadeIn = parseInt(fadeInElem.value);
-    console.log(fadeIn);
 });
 
 fadeOutStartElem.addEventListener('change', () => {
     fadeOutStart = parseInt(fadeOutStartElem.value);
-    console.log(fadeOutStart);
 });
 
+playButtonElem.addEventListener('click', () => {
+    play();
+});
+
+resetDefaultsElem.addEventListener('click', () => {
+    setDefaultParams();
+});
+
+volumeElem.addEventListener('input', (e) => {
+    const fraction = parseInt(e.target.value)/ parseInt(e.target.max);
+    outputBus.gain.value = fraction * fraction;
+});
 
 setDefaultParams();
 
 
 function init() {
     stop();
+    final_freqs = buildChord(chord, chordRootFrequences[root]);
+    console.log(final_freqs);
     frequencyGenerators = getFrequencyGenerators();
     panGenerator = getPanGenerator();
     oscillators = createOscillators();
+}
+
+function buildChord(chord, root) {
+    return chordMultipliers[chord].map(mult => {
+        return root * mult;
+    });
 }
 
 function createOscillators() {
@@ -144,7 +192,7 @@ function createOscillators() {
             .connect(gain)
             .connect(panner)
             .connect(analyser)
-            .connect(audioContext.destination);
+            .connect(outputBus);
 
         oscillators.push({
             osc,
@@ -230,13 +278,16 @@ function getPanGenerator() {
 }
 
 function setDefaultParams() {
-    voices = 30;
-    voicesElem.value = 30;
+    voices = 33;
+    root = 'D';
+    rootElem.value = 'D';
+    chord = 'major';
+    chordElem.value = 'major';
+    voicesElem.value = 33;
     initialFreqLow = 200;
     initialFreqLowElem.value = 200;
     initialFreqHigh = 400;
     initialFreqHighElem.value = 400;
-    final_freqs = [72, 144, 288, 576, 1152, 108, 216, 432, 864, 1458];
     wave = 'sawtooth';
     waveElem.value = 'sawtooth';
     length = 30;
