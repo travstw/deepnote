@@ -1,7 +1,9 @@
 'use strict';
 
 const audioContext = new AudioContext();
+const outputAnalyser = new AnalyserNode(audioContext);
 const outputBus = new GainNode(audioContext, {gain: 0.25});
+outputBus.connect(outputAnalyser);
 outputBus.connect(audioContext.destination);
 
 const chordMultipliers = {
@@ -128,7 +130,6 @@ setDefaultParams();
 function init() {
     stop();
     final_freqs = buildChord(chord, chordRootFrequences[root]);
-    console.log(final_freqs);
     frequencyGenerators = getFrequencyGenerators();
     panGenerator = getPanGenerator();
     oscillators = createOscillators();
@@ -166,7 +167,7 @@ function createOscillators() {
         const gain = new GainNode(audioContext, {
             // gain: finishingGain
             gain: 0.001
-        })
+        });
 
         const panner = new PannerNode(audioContext, {
             positionX: 0.00
@@ -182,7 +183,11 @@ function createOscillators() {
             gain: (Math.random() * 5)  + 1 
         });
 
-        const analyser = new AnalyserNode(audioContext);
+        // const analyser = new AnalyserNode(audioContext, {
+        //     fftSize: 256,
+        //     frequencyBinCount: 128
+        // });
+        // let bin = new Float32Array(analyser.frequencyBinCount);
 
         lfo.connect(lfoGain)
         lfoGain.connect(osc.detune);
@@ -191,7 +196,7 @@ function createOscillators() {
         osc.connect(lp)
             .connect(gain)
             .connect(panner)
-            .connect(analyser)
+            // .connect(analyser)
             .connect(outputBus);
 
         oscillators.push({
@@ -203,7 +208,6 @@ function createOscillators() {
             finishingNote, 
             finishingPan, 
             finishingGain, 
-            analyser, 
             playing: false
         })
     }
@@ -231,10 +235,18 @@ function play() {
             osc.osc.frequency.exponentialRampToValueAtTime(osc.finishingNote, audioContext.currentTime + rampInTime);
         }, 1000 * rampStart);
         
+        // draw(osc);
         osc.osc.start();
+        oscSuicide(osc);
         osc.playing = true;
         
     });
+}
+
+function draw(osc) {
+   setInterval(() => {
+        console.log(osc.osc.frequency.value);
+   }, 1000)
 }
 
 function getFrequencyGenerators() {
@@ -317,5 +329,13 @@ function stop() {
             osc.osc.stop();
         }
     });
+}
+
+
+function oscSuicide(osc) {
+    const watchTimer = setTimeout(() => {
+            osc.osc.stop();
+            osc.playing = false;
+    }, 1000 * (length + 1));
 }
 

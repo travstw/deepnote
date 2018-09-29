@@ -1,0 +1,25 @@
+
+button {
+    width: 100px;
+    height: 50px;
+    font-size: 16px;
+}
+
+.params {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.numInputs {
+    width: 50px;
+    text-align: center;
+}
+
+#buttonContainer {
+    margin-top: 10px;
+}
+
+#parameters {
+    margin-top: 20px;
+    margin-left: 20px;
+}
