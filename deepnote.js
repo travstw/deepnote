@@ -160,7 +160,7 @@ function createOscillators() {
         const lp = new BiquadFilterNode(audioContext, {
             type: 'lowpass', 
             Q: 0.5,
-            frequency: freq * 5
+            frequency: freq > 1000 ? 5000 : freq * 5
         });
 
         const gain = new GainNode(audioContext, {
