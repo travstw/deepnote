@@ -3,51 +3,64 @@
             <link rel="stylesheet" type="text/css" href="styles.css">
     </head>
     <body>
-        <div id="parameters">
-            Voices: <select class="params" id="voices">
-                    <option value="11">10</option>
-                    <option value="22">20</option>
-                    <option value="33" selected>30</option>
-                    <option value="44">40</option>
-                    <option value="55">50</option>
-                    <option value="66">60</option>
-                    <option value="77">70</option>
-                </select><br>
-            Final Chord: <select class="params" id="root">
-                    <option value="A">A</option>
-                    <option value="A#">A#</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="C#">C#</option>
-                    <option value="D" selected>D</option>
-                    <option value="D#">D#</option>
-                    <option value="E">E</option>
-                    <option value="F">F</option>
-                    <option value="F#">F#</option>
-                    <option value="G">G</option>
-                </select>
-                <select id="chord">
-                    <option value="major" selected>major</option>
-                    <option value="minor">minor</option>
-                </select><br>
-            Initial Frequency Range: <input class="params numInputs" id="initialFreqLow" value="200"/><input class="params numInputs" id="initialFreqHigh" value="400"/><br>
-            Wave Shape: <select class="params" id="wave">
-                    <option value="sine">sine</option>
-                    <option value="square">square</option>
-                    <option value="sawtooth" selected>sawtooth</option>
-                    <option value="triangle">triangle</option>
-                    <option value="multi">multi</option>
-                </select><br>
-            Length (sec): <input class="params numInputs" id="length" value="30"/><br>
-            Ramp Start (sec): <input class="params numInputs" id="rampStart" value="13"/><br>
-            Ramp Length (sec): <input class="params numInputs" id="rampLength" value="5"/><br>
-            Fade In (sec): <input class="params numInputs" id="fadeIn" value="14"/><br>
-            Fade Out Start (sec): <input class="params numInputs" id="fadeOutStart" value="26"/>
-        <div id="buttonContainer">
-            <button id="playButton">play</button>
-            <button id="resetDefaults">reset</button>
-        </div><br><br>
-        Volume: <input type="range" min="0" max="100" value="50" class="slider" id="volume">
+        <div id="mainContent">
+            <h1 id="title">the deep note</h1>
+            <hr>
+            <div id="left_panel">
+                <div id="parameters">
+                        voices: <select class="params" id="voices">
+                                <option value="11">10</option>
+                                <option value="22">20</option>
+                                <option value="33" selected>30</option>
+                                <option value="44">40</option>
+                                <option value="55">50</option>
+                                <option value="66">60</option>
+                                <option value="77">70</option>
+                            </select><br>
+                        final chord: <select class="params" id="root">
+                                <option value="A">A</option>
+                                <option value="A#">A#</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="C#">C#</option>
+                                <option value="D" selected>D</option>
+                                <option value="D#">D#</option>
+                                <option value="E">E</option>
+                                <option value="F">F</option>
+                                <option value="F#">F#</option>
+                                <option value="G">G</option>
+                            </select>
+                            <select id="chord">
+                                <option value="major" selected>major</option>
+                                <option value="minor">minor</option>
+                            </select><br>
+                        initial frequency range: <input class="params numInputs" id="initialFreqLow" value="200"/><input class="params numInputs" id="initialFreqHigh" value="400"/><br>
+                        wave shape: <select class="params" id="wave">
+                                <option value="sine">sine</option>
+                                <option value="square">square</option>
+                                <option value="sawtooth" selected>sawtooth</option>
+                                <option value="triangle">triangle</option>
+                                <option value="multi">multi</option>
+                            </select><br>
+                        length (sec): <input class="params numInputs" id="length" value="30"/><br>
+                        ramp start (sec): <input class="params numInputs" id="rampStart" value="13"/><br>
+                        ramp length (sec): <input class="params numInputs" id="rampLength" value="5"/><br>
+                        fade in (sec): <input class="params numInputs" id="fadeIn" value="14"/><br>
+                        fade uut Start (sec): <input class="params numInputs" id="fadeOutStart" value="26"/>
+                    <div id="buttonContainer">
+                        <button id="playButton">play</button>
+                        <button id="resetDefaults">reset</button>
+                    </div><br><br>
+                    volume: <input type="range" min="0" max="100" value="25" class="slider" id="volume">
+                </div>
+            </div>
+            <div id="right_panel">
+                    <div id="canvasContainer">
+                            <canvas id="frequencyTracks"></canvas>
+                    </div>
+            </div>  
+            <hr> 
+        </div>
         <script src="deepnote.js"></script>
     </body>
 </html>

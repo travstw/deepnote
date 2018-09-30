@@ -1,8 +1,28 @@
 
+html {
+    background-color: #52677F;
+    color: #f2f2f2;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.75em;
+}
+
+select {
+    background-color: #52677F;
+    color: #f2f2f2;
+    height: 30px;
+    width: 75px;
+}
+
+#mainContent {
+    width: 100%
+}
+
 button {
-    width: 100px;
+    width: 45%;
     height: 50px;
     font-size: 16px;
+    background-color: #52677F;
+    color: #f2f2f2
 }
 
 .params {
@@ -12,7 +32,11 @@ button {
 
 .numInputs {
     width: 50px;
+    height: 30px;
     text-align: center;
+    background-color: #52677F;
+    color: #f2f2f2;
+    border: solid 0.5px #f2f2f2;
 }
 
 #buttonContainer {
@@ -22,4 +46,36 @@ button {
 #parameters {
     margin-top: 20px;
     margin-left: 20px;
+}
+
+#left_panel {
+    display: inline-block;
+    /* float: left; */
+    width: 30%;
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+#right_panel {
+    display: inline-block;
+    /* float: right; */
+    margin-right: 20px;
+    width: 65%;
+}
+
+canvas {
+    background-color: #52677F;
+    width: 100%;
+    height: 510px;
+    border: solid 1px #f2f2f2
+}
+
+#title {
+    margin-top: 20px;
+    margin-left: 20px;
+}
+
+hr {
+    margin-left: 20px;
+    margin-right: 20px;
 }

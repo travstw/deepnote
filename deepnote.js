@@ -2,9 +2,10 @@
 
 const audioContext = new AudioContext();
 const outputAnalyser = new AnalyserNode(audioContext);
-const outputBus = new GainNode(audioContext, {gain: 0.25});
+const outputBus = new GainNode(audioContext, {gain: 0.07});
 outputBus.connect(outputAnalyser);
 outputBus.connect(audioContext.destination);
+let systemPlaying = false;
 
 const chordMultipliers = {
     major: [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 40.5],
@@ -46,6 +47,8 @@ let fadeOutStart;
 
 //DOM elements
 
+const canvas = document.getElementById('frequencyTracks');
+const drawCtx = canvas.getContext('2d');
 const voicesElem = document.getElementById('voices');
 const rootElem = document.getElementById('root');
 const chordElem = document.getElementById('chord');
@@ -62,10 +65,6 @@ const resetDefaultsElem = document.getElementById('resetDefaults');
 const volumeElem = document.getElementById('volume');
 
 //Event Listeners
-
-
-
-
 voicesElem.addEventListener('change', () => {
     voices = voicesElem.value;
 });
@@ -122,13 +121,14 @@ resetDefaultsElem.addEventListener('click', () => {
 volumeElem.addEventListener('input', (e) => {
     const fraction = parseInt(e.target.value)/ parseInt(e.target.max);
     outputBus.gain.value = fraction * fraction;
+    console.log(outputBus.gain.value);
 });
 
 setDefaultParams();
 
 
 function init() {
-    stop();
+    clearSuicideTimer();
     final_freqs = buildChord(chord, chordRootFrequences[root]);
     frequencyGenerators = getFrequencyGenerators();
     panGenerator = getPanGenerator();
@@ -142,7 +142,6 @@ function buildChord(chord, root) {
 }
 
 function createOscillators() {
-    
     const oscillators = [];
 
     for (let i = 0; i < voices; i++) {
@@ -155,7 +154,7 @@ function createOscillators() {
         const osc = new OscillatorNode(audioContext, {
             type: setWave(),
             frequency: freq,
-            detune: finishingNote === 1458 ? Math.floor((Math.random() * 20) + 1) : 0
+            detune: finishingNote === 1458 ? (Math.random() * 20.0) - 5.0 : (Math.random() * 10.0)  - 1.0
         });
 
         const lp = new BiquadFilterNode(audioContext, {
@@ -174,14 +173,31 @@ function createOscillators() {
             // positionX: 0.001
         });
 
-        const lfo = new OscillatorNode(audioContext, {
+        const detuneLfo = new OscillatorNode(audioContext, {
             type: 'sine', 
-            frequency: Math.random() * 1 
+            frequency: Math.random()
         });
 
-        const lfoGain = new GainNode(audioContext, {
-            gain: (Math.random() * 5)  + 1 
+        const detuneLfoGain = new GainNode(audioContext, {
+            gain: (Math.random() * 5)  + 1
         });
+
+        detuneLfo.connect(detuneLfoGain)
+        detuneLfoGain.connect(osc.detune);
+        detuneLfo.start();
+
+        const freqLfo = new OscillatorNode(audioContext, {
+            type: 'sine', 
+            frequency: Math.random() 
+        });
+
+        const freqLfoGain = new GainNode(audioContext, {
+            gain: Math.random() 
+        });
+
+        freqLfo.connect(freqLfoGain);
+        freqLfoGain.connect(osc.frequency);
+        freqLfo.start();
 
         // const analyser = new AnalyserNode(audioContext, {
         //     fftSize: 256,
@@ -189,9 +205,7 @@ function createOscillators() {
         // });
         // let bin = new Float32Array(analyser.frequencyBinCount);
 
-        lfo.connect(lfoGain)
-        lfoGain.connect(osc.detune);
-        lfo.start();
+        
 
         osc.connect(lp)
             .connect(gain)
@@ -204,11 +218,12 @@ function createOscillators() {
             lp,
             gain,
             panner, 
-            lfo, 
+            detuneLfo,
+            freqLfo, 
             finishingNote, 
             finishingPan, 
             finishingGain, 
-            playing: false
+            playing: false,
         })
     }
     return oscillators;
@@ -226,27 +241,64 @@ function play() {
         }, 1000 * fadeOutStart);
         
         setTimeout(() => {
-            const fadeInTime = rampLength + ((Math.random() * 1) + -0.5);
+            const fadeInTime = rampLength //+ (Math.random() + -0.2);
             osc.panner.positionX.exponentialRampToValueAtTime(osc.finishingPan, audioContext.currentTime + fadeInTime);
-        }, 1000 * rampStart);
+        }, 1000 * (rampStart + (Math.random() + -0.5)));
         
         setTimeout(() => {
-            const rampInTime = rampLength + ((Math.random() * 1) + -0.5);
+            const rampInTime = rampLength //+ (Math.random() + -0.1);
             osc.osc.frequency.exponentialRampToValueAtTime(osc.finishingNote, audioContext.currentTime + rampInTime);
-        }, 1000 * rampStart);
+        }, 1000 * (rampStart + (Math.random() + -0.5)));
         
-        // draw(osc);
+        
         osc.osc.start();
-        oscSuicide(osc);
         osc.playing = true;
-        
     });
+    systemPlaying = true;
+    oscSuicideTimer();
+    visualize();
 }
 
-function draw(osc) {
-   setInterval(() => {
-        console.log(osc.osc.frequency.value);
-   }, 1000)
+function visualize() {
+    const HEIGHT = canvas.height;
+    const WIDTH = canvas.width;
+    let freqDomain = new Uint8Array(outputAnalyser.frequencyBinCount);
+    let timeDomain = new Uint8Array(outputAnalyser.frequencyBinCount);
+
+    (function draw() {
+        if (!systemPlaying) {
+            drawCtx.clearRect(0, 0, WIDTH, HEIGHT);
+            return;
+        }
+        
+        drawCtx.clearRect(0, 0, WIDTH, HEIGHT);
+        // freq Domain
+        requestAnimationFrame(draw);
+        outputAnalyser.getByteFrequencyData(freqDomain);
+        for (let i = 0; i < outputAnalyser.frequencyBinCount; i++) {
+            let value = freqDomain[i];
+            let percent = value / 256;
+            let height = HEIGHT * percent;
+            let offset = HEIGHT - height - 1;
+            let barWidth = (WIDTH/outputAnalyser.frequencyBinCount) * 1.75;
+            let hue = i/outputAnalyser.frequencyBinCount * 360;
+            // drawCtx.fillStyle = 'hsl(' + hue + ', 100%, 50%)';
+            drawCtx.fillStyle = '#9CC7F5';
+            drawCtx.fillRect(i * barWidth, offset, barWidth, height);
+        }
+
+        outputAnalyser.getByteTimeDomainData(timeDomain);
+        for (var i = 0; i < outputAnalyser.frequencyBinCount; i++) {
+            var value = timeDomain[i];
+            var percent = (value / 256);
+            var height = HEIGHT * percent;
+            var offset = HEIGHT - height;
+            var barWidth = WIDTH/outputAnalyser.frequencyBinCount;
+            drawCtx.fillStyle = '#f2f2f2';
+            drawCtx.fillRect(i * barWidth, offset, 1, 1);
+        }
+    })();
+
 }
 
 function getFrequencyGenerators() {
@@ -332,10 +384,16 @@ function stop() {
 }
 
 
-function oscSuicide(osc) {
-    const watchTimer = setTimeout(() => {
-            osc.osc.stop();
-            osc.playing = false;
+// Stops oscillators after length + 1 seconds
+let suicideTimer;
+function oscSuicideTimer() {
+    suicideTimer = setTimeout(() => {
+        stop();
+        systemPlaying = false;
     }, 1000 * (length + 1));
+}
+
+function clearSuicideTimer() {
+    clearTimeout(suicideTimer);
 }
 
