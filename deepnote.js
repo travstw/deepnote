@@ -149,6 +149,8 @@ function createOscillators() {
         const finishingPan = finishingNote < 300 ? 0.00001 : panGenerator.next().value;
         const finishingGain = (finishingNote > 400) ? (Math.random() * 0.4) + 0.2 : (Math.random() * 0.85) + 0.65;
         const freq = Math.floor((Math.random() * initialFreqHigh) + initialFreqLow);
+        console.log(freq);
+        console.log(freq > 1000 ? 5000 : freq * 5);
         let playing = false;
         
         const osc = new OscillatorNode(audioContext, {
