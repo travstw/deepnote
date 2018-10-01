@@ -270,8 +270,7 @@ function visualize() {
             drawCtx.clearRect(0, 0, WIDTH, HEIGHT);
             return;
         }
-        console.log(oscillators[10].panner.pan.value);
-        console.log(oscillators[28].panner.pan.value);
+    
         drawCtx.clearRect(0, 0, WIDTH, HEIGHT);
         // freq Domain
         requestAnimationFrame(draw);
