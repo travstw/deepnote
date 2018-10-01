@@ -149,8 +149,6 @@ function createOscillators() {
         const finishingPan = finishingNote < 300 ? 0.00001 : panGenerator.next().value;
         const finishingGain = (finishingNote > 400) ? (Math.random() * 0.4) + 0.2 : (Math.random() * 0.85) + 0.65;
         const freq = Math.floor((Math.random() * initialFreqHigh) + initialFreqLow);
-        console.log(freq);
-        console.log(freq > 1000 ? 5000 : freq * 5);
         let playing = false;
         
         const osc = new OscillatorNode(audioContext, {
@@ -170,8 +168,8 @@ function createOscillators() {
             gain: 0.001
         });
 
-        const panner = new PannerNode(audioContext, {
-            positionX: 0.00
+        const panner = new StereoPannerNode(audioContext, {
+            pan: 0.001
             // positionX: 0.001
         });
 
@@ -244,7 +242,7 @@ function play() {
         
         setTimeout(() => {
             const fadeInTime = rampLength //+ (Math.random() + -0.2);
-            osc.panner.positionX.exponentialRampToValueAtTime(osc.finishingPan, audioContext.currentTime + fadeInTime);
+            osc.panner.pan.exponentialRampToValueAtTime(osc.finishingPan, audioContext.currentTime + fadeInTime);
         }, 1000 * (rampStart + (Math.random() + -0.5)));
         
         setTimeout(() => {
@@ -272,7 +270,8 @@ function visualize() {
             drawCtx.clearRect(0, 0, WIDTH, HEIGHT);
             return;
         }
-        
+        console.log(oscillators[10].panner.pan.value);
+        console.log(oscillators[28].panner.pan.value);
         drawCtx.clearRect(0, 0, WIDTH, HEIGHT);
         // freq Domain
         requestAnimationFrame(draw);
